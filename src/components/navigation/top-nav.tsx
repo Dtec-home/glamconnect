@@ -16,6 +16,12 @@ export function TopNav() {
           <a href="/profile" className="hover:text-zinc-900 dark:hover:text-zinc-100">
             Profile
           </a>
+          <a href="/login" className="hover:text-zinc-900 dark:hover:text-zinc-100">
+            Login
+          </a>
+          <a href="/register" className="hover:text-zinc-900 dark:hover:text-zinc-100">
+            Register
+          </a>
         </nav>
       </div>
     </header>
