@@ -16,6 +16,8 @@ import {
   getMyServices,
 } from "@/lib/api/marketplace";
 
+type ServiceFormValues = z.infer<typeof serviceSchema>;
+
 const serviceSchema = z.object({
   title: z.string().min(3),
   description: z.string().min(10),
@@ -24,12 +26,11 @@ const serviceSchema = z.object({
 });
 
 const imageSchema = z.object({
-  image_url: z.url(),
+  image_url: z.string().url(),
   caption: z.string().optional(),
   service_id: z.coerce.number().int().positive().optional(),
 });
 
-type ServiceFormValues = z.infer<typeof serviceSchema>;
 type ImageFormValues = z.infer<typeof imageSchema>;
 
 export default function DashboardPage() {

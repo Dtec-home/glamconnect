@@ -11,7 +11,7 @@ import { setAuthToken } from "@/lib/auth-token";
 
 const schema = z.object({
   username: z.string().min(3),
-  email: z.email(),
+  email: z.string().email(),
   password: z.string().min(8),
   role: z.enum(["provider", "client"]),
 });
