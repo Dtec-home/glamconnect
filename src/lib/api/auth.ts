@@ -1,6 +1,7 @@
 import { gql } from "graphql-request";
 
 import { graphqlClient } from "@/lib/graphql-client";
+import { getAuthToken } from "@/lib/auth-token";
 
 export type AuthUser = {
   id: string;
@@ -14,6 +15,18 @@ export type AuthPayload = {
   token: string;
   user: AuthUser;
 };
+
+const meQuery = gql`
+  query Me {
+    me {
+      id
+      username
+      email
+      is_provider
+      is_client
+    }
+  }
+`;
 
 const registerMutation = gql`
   mutation Register($data: RegisterInput!) {
@@ -70,4 +83,13 @@ export async function login(input: { username: string; password: string }) {
   );
 
   return result.login;
+}
+
+export async function getMe() {
+  const token = getAuthToken();
+  const result = await graphqlClient.request<{ me: AuthUser | null }>(meQuery, undefined, {
+    Authorization: token ? `Bearer ${token}` : "",
+  });
+
+  return result.me;
 }

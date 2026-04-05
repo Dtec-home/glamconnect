@@ -1,4 +1,28 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+import { getMe } from "@/lib/api/auth";
+
 export default function Home() {
+  const router = useRouter();
+  const meQuery = useQuery({
+    queryKey: ["me"],
+    queryFn: getMe,
+  });
+
+  useEffect(() => {
+    if (meQuery.data) {
+      router.replace("/dashboard");
+    }
+  }, [meQuery.data, router]);
+
+  if (meQuery.data) {
+    return <section className="w-full text-sm text-zinc-600">Redirecting to dashboard...</section>;
+  }
+
   return (
     <section className="flex w-full flex-col gap-6">
       <div className="space-y-2">
@@ -6,8 +30,7 @@ export default function Home() {
           Service Provider Marketplace
         </h1>
         <p className="text-sm text-zinc-600 dark:text-zinc-300 md:text-base">
-          Foundation sprint is active. Authentication, profiles, and booking flows
-          will be layered on this shell.
+          Sprint 6 is active. Final UX polish and deployment readiness are now in focus.
         </p>
       </div>
 
@@ -37,9 +60,9 @@ export default function Home() {
       <div className="rounded-xl border bg-white p-5 shadow-sm dark:bg-zinc-900">
         <h2 className="text-sm font-semibold">Next Sprint Preview</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-zinc-600 dark:text-zinc-300">
-          <li>Registration and login mutations</li>
-          <li>Provider and client profile models</li>
-          <li>Role-based route guarding</li>
+          <li>Final QA pass across booking and reviews lifecycle</li>
+          <li>Deployment rollout to Vercel + Render/Railway</li>
+          <li>Post-launch hardening and monitoring checklist</li>
         </ul>
       </div>
     </section>

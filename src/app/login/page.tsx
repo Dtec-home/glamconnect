@@ -30,11 +30,7 @@ export default function LoginPage() {
     mutationFn: login,
     onSuccess: (payload) => {
       setAuthToken(payload.token);
-      if (payload.user.is_provider) {
-        router.push("/dashboard");
-        return;
-      }
-      router.push("/");
+      router.push("/dashboard");
     },
   });
 
@@ -43,7 +39,10 @@ export default function LoginPage() {
   };
 
   return (
-    <section className="mx-auto w-full max-w-md rounded-xl border bg-white p-6 shadow-sm dark:bg-zinc-900">
+    <section
+      suppressHydrationWarning
+      className="mx-auto w-full max-w-md rounded-xl border bg-white p-6 shadow-sm dark:bg-zinc-900"
+    >
       <h1 className="text-xl font-semibold">Login</h1>
       <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
         Sign in as provider or client.
