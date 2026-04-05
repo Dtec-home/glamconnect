@@ -18,6 +18,12 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+import { UserPlus, Mail, Lock, User, Briefcase, ShieldCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
+import { motion } from "framer-motion";
+
 export default function RegisterPage() {
   const router = useRouter();
   const {
@@ -44,89 +50,118 @@ export default function RegisterPage() {
   };
 
   return (
-    <section
-      suppressHydrationWarning
-      className="mx-auto w-full max-w-md rounded-xl border bg-white p-6 shadow-sm dark:bg-zinc-900"
-    >
-      <h1 className="text-xl font-semibold">Register</h1>
-      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-        Create your provider or client account.
-      </p>
-
-      <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)}>
-        <div className="space-y-1">
-          <label className="text-sm font-medium" htmlFor="username">
-            Username
-          </label>
-          <input
-            id="username"
-            className="w-full rounded-md border px-3 py-2 text-sm"
-            {...register("username")}
-          />
-          {errors.username ? (
-            <p className="text-xs text-red-600">{errors.username.message}</p>
-          ) : null}
+    <div className="flex w-full items-center justify-center py-12 px-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-md"
+      >
+        <div className="mb-10 text-center">
+          <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/20">
+            <UserPlus className="text-white" size={24} />
+          </div>
+          <h1 className="text-3xl font-black tracking-tight">Create Account</h1>
+          <p className="mt-2 text-muted-foreground font-medium">Join GlamKonnect and elevate your professional network.</p>
         </div>
 
-        <div className="space-y-1">
-          <label className="text-sm font-medium" htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            className="w-full rounded-md border px-3 py-2 text-sm"
-            {...register("email")}
-          />
-          {errors.email ? (
-            <p className="text-xs text-red-600">{errors.email.message}</p>
-          ) : null}
+        <div className="rounded-3xl border border-border/50 bg-card/50 p-8 shadow-xl backdrop-blur-sm sm:p-10">
+          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1" htmlFor="username">
+                Username
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                <Input
+                  id="username"
+                  className="pl-10 h-12 rounded-xl bg-background/50 border-border/50 focus-visible:ring-primary/20 transition-all font-medium"
+                  placeholder="johndoe"
+                  {...register("username")}
+                />
+              </div>
+              {errors.username && <p className="px-1 text-[10px] font-bold text-red-500 uppercase">{errors.username.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1" htmlFor="email">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                <Input
+                  id="email"
+                  type="email"
+                  className="pl-10 h-12 rounded-xl bg-background/50 border-border/50 focus-visible:ring-primary/20 transition-all font-medium"
+                  placeholder="john@example.com"
+                  {...register("email")}
+                />
+              </div>
+              {errors.email && <p className="px-1 text-[10px] font-bold text-red-500 uppercase">{errors.email.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1" htmlFor="password">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                <Input
+                  id="password"
+                  type="password"
+                  className="pl-10 h-12 rounded-xl bg-background/50 border-border/50 focus-visible:ring-primary/20 transition-all font-medium"
+                  placeholder="••••••••"
+                  {...register("password")}
+                />
+              </div>
+              {errors.password && <p className="px-1 text-[10px] font-bold text-red-500 uppercase">{errors.password.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1" htmlFor="role">
+                I want to be a...
+              </label>
+              <div className="relative">
+                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                <select
+                  id="role"
+                  className="w-full pl-10 pr-4 h-12 rounded-xl border border-border/50 bg-background/50 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none appearance-none transition-all"
+                  {...register("role")}
+                >
+                  <option value="client">Client (Hiring Services)</option>
+                  <option value="provider">Provider (Professional)</option>
+                </select>
+              </div>
+              {errors.role && <p className="px-1 text-[10px] font-bold text-red-500 uppercase">{errors.role.message}</p>}
+            </div>
+
+            {authMutation.error && (
+              <div className="rounded-xl bg-red-500/10 p-3 text-center text-[10px] font-bold text-red-500 uppercase border border-red-500/20">
+                Registration failed. Try a different username/email.
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={authMutation.isPending}
+              className="w-full rounded-xl h-12 font-bold shadow-lg shadow-primary/20 tracking-wide text-sm mt-4"
+            >
+              {authMutation.isPending ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
+            </Button>
+          </form>
+
+          <div className="mt-8 text-center text-xs font-medium text-muted-foreground">
+            Already have an account?{" "}
+            <Link href="/login" className="font-bold text-primary hover:underline underline-offset-4">
+              Sign In
+            </Link>
+          </div>
         </div>
-
-        <div className="space-y-1">
-          <label className="text-sm font-medium" htmlFor="password">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            className="w-full rounded-md border px-3 py-2 text-sm"
-            {...register("password")}
-          />
-          {errors.password ? (
-            <p className="text-xs text-red-600">{errors.password.message}</p>
-          ) : null}
+        
+        <div className="mt-10 flex items-center justify-center gap-6 text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-50">
+           <div className="flex items-center gap-1.5"><ShieldCheck size={12} /> SECURE SSL</div>
+           <div className="flex items-center gap-1.5"><Lock size={12} /> DATACENTER ENCRYPTION</div>
         </div>
-
-        <div className="space-y-1">
-          <label className="text-sm font-medium" htmlFor="role">
-            Role
-          </label>
-          <select
-            id="role"
-            className="w-full rounded-md border px-3 py-2 text-sm"
-            {...register("role")}
-          >
-            <option value="client">Client</option>
-            <option value="provider">Provider</option>
-          </select>
-          {errors.role ? (
-            <p className="text-xs text-red-600">{errors.role.message}</p>
-          ) : null}
-        </div>
-
-        {authMutation.error ? (
-          <p className="text-xs text-red-600">Unable to register.</p>
-        ) : null}
-
-        <button
-          type="submit"
-          disabled={authMutation.isPending}
-          className="w-full rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900"
-        >
-          {authMutation.isPending ? "Creating account..." : "Create account"}
-        </button>
-      </form>
-    </section>
+      </motion.div>
+    </div>
   );
 }

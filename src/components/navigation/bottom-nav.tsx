@@ -29,7 +29,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-card/95 backdrop-blur sm:hidden">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/50 bg-background/80 backdrop-blur-md sm:hidden">
       <ul className="mx-auto grid h-16 max-w-2xl grid-cols-4">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -40,14 +40,21 @@ export function BottomNav() {
               <Link
                 href={item.href}
                 aria-label={item.label}
-                className={`flex h-full flex-col items-center justify-center gap-1 px-1 text-xs transition-colors ${
+                className={`group flex h-full flex-col items-center justify-center gap-1 px-1 transition-all ${
                   active
                     ? "text-primary"
-                    : "text-foreground/60 hover:text-foreground"
+                    : "text-foreground/50 hover:text-foreground"
                 }`}
               >
-                <Icon size={18} />
-                <span>{item.label}</span>
+                <div className={`relative flex items-center justify-center transition-transform group-active:scale-90 ${active ? "scale-110" : ""}`}>
+                  <Icon size={20} strokeWidth={active ? 2.5 : 2} />
+                  {active && (
+                    <span className="absolute -inset-2 rounded-full bg-primary/10 -z-10 animate-in fade-in zoom-in duration-300" />
+                  )}
+                </div>
+                <span className={`text-[10px] font-medium transition-colors ${active ? "text-primary" : ""}`}>
+                  {item.label}
+                </span>
               </Link>
             </li>
           );

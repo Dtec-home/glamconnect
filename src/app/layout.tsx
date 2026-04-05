@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Wacu Marketplace",
-  description: "Service provider marketplace",
+  title: "GlamKonnect | Premier Marketplace for World-Class Experts",
+  description: "Connect with elite professionals in Wellness, Tech, Creative Arts, and Style. The ultimate community for premium service excellence.",
 };
 
 export default function RootLayout({

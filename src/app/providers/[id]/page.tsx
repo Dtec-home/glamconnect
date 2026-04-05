@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Star } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -14,6 +13,11 @@ import {
   getProviderServices,
 } from "@/lib/api/marketplace";
 import { getProviderRatingSummary, getReviewsForProvider } from "@/lib/api/reviews";
+
+import { MapPin, Star, Calendar, MessageCircle, ShieldCheck, ArrowLeft, Grid } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { motion } from "framer-motion";
 
 export default function ProviderProfilePage() {
   const params = useParams<{ id: string }>();
@@ -53,163 +57,200 @@ export default function ProviderProfilePage() {
   const [bookingMessage, setBookingMessage] = useState<string | null>(null);
 
   if (providerQuery.isLoading) {
-    return <section className="w-full">Loading provider profile...</section>;
+    return <div className="flex min-h-[400px] items-center justify-center"><div className="animate-spin size-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
   }
 
   if (providerQuery.isError || !providerQuery.data) {
-    return <section className="w-full text-red-600">Provider not found.</section>;
+    return (
+      <div className="flex min-h-[400px] flex-col items-center justify-center text-center">
+        <p className="text-lg font-bold text-red-500 mb-4">Professional profile not found.</p>
+        <Link href="/providers"><Button variant="outline" className="rounded-xl">Back to Search</Button></Link>
+      </div>
+    );
   }
 
   const provider = providerQuery.data;
 
   return (
-    <section className="flex w-full flex-col gap-6">
-      <div className="rounded-xl border bg-white p-6 shadow-sm dark:bg-zinc-900">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="text-xl font-semibold">{provider.user.username}</h1>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-              {provider.location || "Location not set"}
-            </p>
+    <div className="flex w-full flex-col gap-10 pb-20">
+      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-card/50 p-6 shadow-sm backdrop-blur-sm sm:p-10 lg:p-12">
+        <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 size-96 bg-primary/5 rounded-full blur-3xl opacity-50" />
+        
+        <Link href="/providers" className="mb-8 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors">
+          <ArrowLeft size={14} /> Back to Search
+        </Link>
+        
+        <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+             <div className="size-28 rounded-3xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center text-white text-3xl font-bold shadow-xl shadow-primary/20">
+               {provider.user.username[0].toUpperCase()}
+             </div>
+             <div className="space-y-2">
+               <div className="flex flex-wrap items-center gap-3">
+                 <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{provider.user.username}</h1>
+                 {provider.is_verified && <VerificationBadge />}
+               </div>
+               <div className="flex flex-wrap items-center gap-4 text-muted-foreground font-medium">
+                 <div className="flex items-center gap-1.5"><MapPin size={16} className="text-primary" /> {provider.location || "Available Worldwide"}</div>
+                 <div className="flex items-center gap-1.5"><Star size={16} className="text-yellow-500 fill-yellow-500" /> {ratingSummaryQuery.data?.average_rating?.toFixed(1) ?? "0.0"} ({ratingSummaryQuery.data?.review_count ?? 0} Reviews)</div>
+               </div>
+             </div>
           </div>
-          {provider.is_verified ? <VerificationBadge /> : null}
+          <div className="flex gap-3">
+            <Button className="rounded-2xl h-12 px-6 font-bold shadow-lg shadow-primary/20 gap-2">
+              <MessageCircle size={18} /> Message
+            </Button>
+            <Button variant="outline" className="rounded-2xl h-12 px-5 border-border/50">
+               Follow
+            </Button>
+          </div>
         </div>
-        <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-300">
-          {provider.bio || "No bio available."}
-        </p>
-        <div className="mt-3 flex items-center gap-2 text-sm">
-          <span className="font-medium">Rating:</span>
-          <span>
-            {ratingSummaryQuery.data?.average_rating?.toFixed(2) ?? "0.00"} / 5
-          </span>
-          <span className="text-zinc-500">
-            ({ratingSummaryQuery.data?.review_count ?? 0} reviews)
-          </span>
+        
+        <div className="mt-10 max-w-3xl">
+           <p className="text-lg text-foreground/80 leading-relaxed font-medium">
+             {provider.bio || "This professional is dedicated to providing high-quality service and hasn't added a full biography to their profile yet."}
+           </p>
         </div>
       </div>
 
-      <div className="rounded-xl border bg-white p-6 shadow-sm dark:bg-zinc-900">
-        <h2 className="text-base font-semibold">Services</h2>
-        {servicesQuery.isLoading ? <p className="mt-3 text-sm">Loading services...</p> : null}
-        {servicesQuery.isError ? (
-          <p className="mt-3 text-sm text-red-600">Unable to load services.</p>
-        ) : null}
+      <div className="grid gap-10 lg:grid-cols-12">
+        <div className="lg:col-span-12 space-y-6">
+          <div className="flex items-center gap-2 px-1">
+            <Grid size={20} className="text-primary" />
+            <h2 className="text-2xl font-bold">Services & Pricing</h2>
+          </div>
+          
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {servicesQuery.data?.map((service) => (
+              <motion.div
+                key={service.id}
+                whileHover={{ y: -4 }}
+                className="group relative flex flex-col rounded-2xl border border-border/50 bg-card p-6 shadow-sm shadow-black/5"
+              >
+                <div className="mb-4 flex justify-between items-start">
+                  <h3 className="text-lg font-bold group-hover:text-primary transition-colors">{service.title}</h3>
+                  <div className="rounded-xl bg-primary/10 px-3 py-1 font-black text-primary text-sm">${service.price}</div>
+                </div>
+                <p className="text-sm text-muted-foreground line-clamp-2 mb-6 flex-grow">{service.description}</p>
+                
+                <div className="space-y-4 pt-4 border-t border-border/50">
+                   <div className="flex items-center justify-between text-xs font-bold text-muted-foreground uppercase tracking-widest">
+                     <span>Duration</span>
+                     <span>{service.duration} Mins</span>
+                   </div>
+                   
+                   <div className="relative">
+                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                     <input
+                       type="datetime-local"
+                       className="w-full rounded-xl border border-border/50 bg-background/50 pl-9 pr-3 py-2 text-xs focus:ring-2 focus:ring-primary/20 outline-none"
+                       value={bookingDateTime}
+                       onChange={(event) => setBookingDateTime(event.target.value)}
+                     />
+                   </div>
+                   
+                   <Button 
+                      className="w-full rounded-xl py-6 font-bold shadow-lg shadow-black/5"
+                      onClick={async () => {
+                        if (!bookingDateTime) {
+                          setBookingMessage("Please select a date and time first.");
+                          return;
+                        }
+                        try {
+                          await createBooking({
+                            service_id: Number(service.id),
+                            scheduled_for: new Date(bookingDateTime).toISOString(),
+                          });
+                          setBookingMessage("Booking request sent successfully!");
+                        } catch {
+                          setBookingMessage("Something went wrong. Are you logged in as a client?");
+                        }
+                      }}
+                   >
+                     Book Service
+                   </Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          {bookingMessage && (
+            <div className="rounded-xl bg-primary/10 p-3 text-center text-xs font-bold text-primary animate-in fade-in slide-in-from-bottom-2">
+              {bookingMessage}
+            </div>
+          )}
+        </div>
 
-        <ul className="mt-4 space-y-3">
-          {servicesQuery.data?.map((service) => (
-            <li key={service.id} className="rounded-lg border p-3">
-              <p className="font-medium">{service.title}</p>
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-                {service.description}
-              </p>
-              <p className="mt-2 text-xs text-zinc-500">
-                ${service.price} • {service.duration} mins
-              </p>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <input
-                  type="datetime-local"
-                  className="rounded border px-2 py-1 text-xs"
-                  value={bookingDateTime}
-                  onChange={(event) => setBookingDateTime(event.target.value)}
-                />
-                <button
-                  type="button"
-                  className="rounded bg-zinc-900 px-3 py-1 text-xs font-medium text-white dark:bg-zinc-100 dark:text-zinc-900"
-                  onClick={async () => {
-                    if (!bookingDateTime) {
-                      setBookingMessage("Choose date/time before booking.");
-                      return;
-                    }
-
-                    try {
-                      await createBooking({
-                        service_id: Number(service.id),
-                        scheduled_for: new Date(bookingDateTime).toISOString(),
-                      });
-                      setBookingMessage("Booking created successfully.");
-                    } catch {
-                      setBookingMessage("Unable to create booking. Ensure you are logged in as client.");
-                    }
-                  }}
-                >
-                  Book Now
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-        {bookingMessage ? (
-          <p className="mt-3 text-xs text-zinc-600 dark:text-zinc-300">{bookingMessage}</p>
-        ) : null}
-      </div>
-
-      <div className="rounded-xl border bg-white p-6 shadow-sm dark:bg-zinc-900">
-        <h2 className="text-base font-semibold">Portfolio</h2>
-        {imagesQuery.isLoading ? <p className="mt-3 text-sm">Loading images...</p> : null}
-        {imagesQuery.isError ? (
-          <p className="mt-3 text-sm text-red-600">Unable to load images.</p>
-        ) : null}
-
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-          {imagesQuery.data?.map((image) => (
-            <li key={image.id} className="rounded-lg border p-2">
-              <Image
-                src={image.image_url}
-                alt={image.caption || "Portfolio image"}
-                className="h-32 w-full rounded object-cover"
-                width={420}
-                height={220}
-              />
-              <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-300">
-                {image.caption || "No caption"}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="rounded-xl border bg-white p-6 shadow-sm dark:bg-zinc-900">
-        <h2 className="text-base font-semibold">Reviews</h2>
-        {reviewsQuery.isLoading ? <p className="mt-3 text-sm">Loading reviews...</p> : null}
-        {reviewsQuery.isError ? (
-          <p className="mt-3 text-sm text-red-600">Unable to load reviews.</p>
-        ) : null}
-
-        <ul className="mt-4 space-y-3">
-          {reviewsQuery.data?.map((review) => (
-            <li key={review.id} className="rounded-lg border p-3">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-medium">{review.client.username}</p>
-                <p className="text-xs text-zinc-500">
-                  {new Date(review.created_at).toLocaleDateString()}
-                </p>
-              </div>
-              <div className="mt-1 flex gap-1 text-yellow-500">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <Star key={value} size={14} fill={value <= review.rating ? "currentColor" : "none"} />
-                ))}
-              </div>
-              {review.comment ? (
-                <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">{review.comment}</p>
-              ) : null}
-              {review.image_url ? (
+        <div className="lg:col-span-12 space-y-6 pt-10">
+          <div className="flex items-center gap-2 px-1">
+             <ShieldCheck size={20} className="text-primary" />
+             <h2 className="text-2xl font-bold">Portfolio Gallery</h2>
+          </div>
+          
+          <div className="grid gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
+            {imagesQuery.data?.map((image) => (
+              <motion.div
+                key={image.id}
+                whileHover={{ scale: 1.02 }}
+                className="group relative aspect-square overflow-hidden rounded-2xl border border-border/50"
+              >
                 <Image
-                  src={review.image_url}
-                  alt="Review attachment"
-                  className="mt-2 h-32 w-full rounded object-cover sm:w-56"
-                  width={420}
-                  height={220}
+                  src={image.image_url}
+                  alt={image.caption || "Portfolio work"}
+                  fill
+                  className="object-cover transition-transform group-hover:scale-110"
                 />
-              ) : null}
-              {review.provider_reply ? (
-                <p className="mt-2 rounded bg-zinc-100 p-2 text-xs dark:bg-zinc-800">
-                  Provider reply: {review.provider_reply}
-                </p>
-              ) : null}
-            </li>
-          ))}
-        </ul>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                   <p className="text-[10px] font-bold text-white uppercase tracking-wider">{image.caption || "View Work"}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <div className="lg:col-span-12 space-y-6 pt-10">
+          <div className="flex items-center gap-2 px-1">
+             <Star size={20} className="text-yellow-500" />
+             <h2 className="text-2xl font-bold">Client Reviews</h2>
+          </div>
+          
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {reviewsQuery.data?.map((review) => (
+              <div key={review.id} className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="size-8 rounded-full bg-muted flex items-center justify-center font-bold text-xs">
+                      {review.client.username[0].toUpperCase()}
+                    </div>
+                    <p className="text-sm font-bold">{review.client.username}</p>
+                  </div>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase">{new Date(review.created_at).toLocaleDateString()}</p>
+                </div>
+                
+                <div className="flex gap-0.5 mb-3 text-yellow-500">
+                  {[1, 2, 3, 4, 5].map((v) => (
+                    <Star key={v} size={14} fill={v <= review.rating ? "currentColor" : "none"} />
+                  ))}
+                </div>
+                
+                {review.comment && <p className="text-sm leading-relaxed text-foreground/80 mb-4">&ldquo;{review.comment}&rdquo;</p>}
+                
+                {review.image_url && (
+                  <div className="relative aspect-video rounded-xl overflow-hidden mb-4 border border-border/10">
+                    <Image src={review.image_url} alt="Review snapshot" fill className="object-cover" />
+                  </div>
+                )}
+                
+                {review.provider_reply && (
+                  <div className="rounded-xl bg-primary/5 p-4 border border-primary/10">
+                    <p className="text-[10px] font-black uppercase text-primary mb-1 tracking-widest">Provider Response</p>
+                    <p className="text-xs italic leading-snug">{review.provider_reply}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
