@@ -1,70 +1,83 @@
-"use client";
+import Link from "next/link";
 
-import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { getMe } from "@/lib/api/auth";
+const highlights = [
+  {
+    title: "Discover trusted providers",
+    description: "Browse verified beauty and home service experts near you.",
+  },
+  {
+    title: "Book in minutes",
+    description: "Choose a service, pick a time, and send your booking request instantly.",
+  },
+  {
+    title: "Rate and review",
+    description: "Share feedback after each completed booking to build community trust.",
+  },
+];
 
 export default function Home() {
-  const router = useRouter();
-  const meQuery = useQuery({
-    queryKey: ["me"],
-    queryFn: getMe,
-  });
-
-  useEffect(() => {
-    if (meQuery.data) {
-      router.replace("/dashboard");
-    }
-  }, [meQuery.data, router]);
-
-  if (meQuery.data) {
-    return <section className="w-full text-sm text-zinc-600">Redirecting to dashboard...</section>;
-  }
-
   return (
-    <section className="flex w-full flex-col gap-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
-          Service Provider Marketplace
-        </h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-300 md:text-base">
-          Sprint 6 is active. Final UX polish and deployment readiness are now in focus.
-        </p>
+    <section className="flex w-full flex-col gap-10">
+      <div className="rounded-2xl border border-border bg-card p-6 sm:p-10">
+        <div className="mx-auto flex max-w-3xl flex-col items-start gap-5 text-left">
+          <p className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            Wacu Marketplace
+          </p>
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">
+            Find and book top local service providers.
+          </h1>
+          <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">
+            From makeup artists to home cleaning pros, Wacu helps clients connect with trusted
+            providers and manage bookings in one simple platform.
+          </p>
+
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Button asChild>
+              <Link href="/register">Get started</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/providers">Explore providers</Link>
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <article className="rounded-xl border bg-white p-5 shadow-sm dark:bg-zinc-900">
-          <h2 className="text-sm font-semibold">Backend</h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
-            Django project created with custom user model and GraphQL endpoint.
-          </p>
-        </article>
-
-        <article className="rounded-xl border bg-white p-5 shadow-sm dark:bg-zinc-900">
-          <h2 className="text-sm font-semibold">Frontend</h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
-            Next.js App Router shell with desktop and mobile navigation layout.
-          </p>
-        </article>
-
-        <article className="rounded-xl border bg-white p-5 shadow-sm dark:bg-zinc-900">
-          <h2 className="text-sm font-semibold">Data Layer</h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
-            React Query provider and GraphQL client scaffolded for upcoming features.
-          </p>
-        </article>
+        {highlights.map((item) => (
+          <Card key={item.title}>
+            <CardHeader>
+              <CardTitle className="text-base">{item.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">{item.description}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      <div className="rounded-xl border bg-white p-5 shadow-sm dark:bg-zinc-900">
-        <h2 className="text-sm font-semibold">Next Sprint Preview</h2>
-        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-zinc-600 dark:text-zinc-300">
-          <li>Final QA pass across booking and reviews lifecycle</li>
-          <li>Deployment rollout to Vercel + Render/Railway</li>
-          <li>Post-launch hardening and monitoring checklist</li>
-        </ul>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>For clients and providers</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold">Clients</h3>
+            <p className="text-sm text-muted-foreground">
+              Discover services, compare profiles, and manage booking requests from one dashboard.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold">Providers</h3>
+            <p className="text-sm text-muted-foreground">
+              Create services, upload portfolio images, and grow your visibility with verified
+              reviews.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </section>
   );
 }

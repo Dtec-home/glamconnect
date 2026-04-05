@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { AppSidebar } from "@/components/navigation/app-sidebar";
-import { BottomNav } from "@/components/navigation/bottom-nav";
+import { AppChrome } from "@/components/navigation/app-chrome";
 import { QueryProvider } from "@/providers/query-provider";
 import "./globals.css";
 
@@ -33,23 +32,10 @@ export default function RootLayout({
     >
       <body
         suppressHydrationWarning
-        className="min-h-full bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-50"
+        className="min-h-full bg-background text-foreground"
       >
         <QueryProvider>
-          <div className="flex min-h-screen">
-            <AppSidebar />
-
-            <div className="flex flex-1 flex-col pb-16 sm:pb-0">
-              <header className="border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-950 sm:hidden">
-                <p className="text-sm font-semibold tracking-wide">Wacu Marketplace</p>
-              </header>
-
-              <main className="flex w-full flex-1 px-4 py-6 sm:px-8 sm:py-8">
-                {children}
-              </main>
-              <BottomNav />
-            </div>
-          </div>
+          <AppChrome>{children}</AppChrome>
         </QueryProvider>
       </body>
     </html>
