@@ -1,17 +1,28 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { getMe } from "@/lib/api/auth";
+import { clearAuthToken } from "@/lib/auth-token";
 import { User2, Mail, Shield, LogOut, Settings, Bell, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
   const meQuery = useQuery({
     queryKey: ["me"],
     queryFn: getMe,
   });
+
+  const onLogout = async () => {
+    clearAuthToken();
+    await queryClient.invalidateQueries({ queryKey: ["me"] });
+    router.push("/login");
+  };
 
   const user = meQuery.data;
 
@@ -50,7 +61,10 @@ export default function ProfilePage() {
              </button>
            ))}
            <div className="pt-4 mt-4 border-t border-border/50">
-             <button className="flex w-full items-center gap-3 rounded-xl p-3 text-sm font-bold text-red-500 hover:bg-red-500/10 transition-all">
+             <button 
+               onClick={onLogout}
+               className="flex w-full items-center gap-3 rounded-xl p-3 text-sm font-bold text-red-500 hover:bg-red-500/10 transition-all"
+             >
                <LogOut size={18} /> Logout Session
              </button>
            </div>
